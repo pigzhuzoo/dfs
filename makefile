@@ -23,6 +23,7 @@ clean:
 	mkdir -p bin
 
 start:
+	mkdir -p logs
 	bin/dfs /DFS1 10001 &> logs/dfs1.log &
 	bin/dfs /DFS2 10002 &> logs/dfs2.log &
 	bin/dfs /DFS3 10003 &> logs/dfs3.log &

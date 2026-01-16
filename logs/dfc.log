@@ -1,0 +1,42 @@
+DEBUG: Command Sent is MKDIR: test
+DEBUG: Validating the command input
+DEBUG: Building the command to be send
+DEBUG: Command Built: FLAG 3 USERNAME Bob PASSWORD ComplextPassword FOLDER test/ FILENAME NULL
+
+DEBUG: Creating Connections
+DEBUG: Executing the command on remote servers
+DEBUG: Sending the command over to the servers
+DEBUG: Command sent over to the server successfully
+DEBUG: Tearing down connections
+DEBUG: Command Sent is PUT: /home/lab/cmake-3.24.3.tar.gz test/cmake-3.24.3.tar.gz
+DEBUG: Validating the command input
+DEBUG: Building the command to be send
+DEBUG: Command Built: FLAG 2 USERNAME Bob PASSWORD ComplextPassword FOLDER test/ FILENAME cmake-3.24.3.tar.gz
+
+DEBUG: Creating Connections
+DEBUG: Executing the command on remote servers
+DEBUG: Sending the command over to the servers
+DEBUG: Command sent over to the server successfully
+DEBUG: Getting mod value on file-content
+DEBUG: MOD:: 1
+DEBUG: Splitting file into pieces
+DEBUG: Encrypting the file splits
+DEBUG: Sending splits to servers
+DEBUG: Splits sent to servers
+DEBUG: Tearing down connections
+DEBUG: Command Sent is PUT: /home/lab/cmake-3.24.3.tar.gz cmake-3.24.3.tar.gz
+DEBUG: Validating the command input
+DEBUG: Building the command to be send
+DEBUG: Command Built: FLAG 2 USERNAME Bob PASSWORD ComplextPassword FOLDER / FILENAME cmake-3.24.3.tar.gz
+
+DEBUG: Creating Connections
+DEBUG: Executing the command on remote servers
+DEBUG: Sending the command over to the servers
+DEBUG: Command sent over to the server successfully
+DEBUG: Getting mod value on file-content
+DEBUG: MOD:: 1
+DEBUG: Splitting file into pieces
+DEBUG: Encrypting the file splits
+DEBUG: Sending splits to servers
+DEBUG: Splits sent to servers
+DEBUG: Tearing down connections

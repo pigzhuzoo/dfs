@@ -21,7 +21,10 @@ int main(int argc, char** argv)
 
   read_dfs_conf(file_name, &conf);
   strcpy(conf.server_name, server_folder + 1);
+  // printf("%s\n",server_folder);
+  // printf("%s\n",conf.server_name);
   // Assumption that server_folder begins with a /
+  dfs_directory_creator(++server_folder, &conf);
   /*dfs_directory_creator(++server_folder, &conf);*/
 
   listen_fd = get_dfs_socket(port_number);

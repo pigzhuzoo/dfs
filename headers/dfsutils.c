@@ -387,12 +387,57 @@ void insert_dfs_user_conf(char* line, dfs_conf_struct* conf)
   conf->users[i]->password = strdup(ptr);
 }
 
+// 静态内部辅助函数：递归创建多级目录（不对外暴露）
+static int mkdir_recursive(const char *path, mode_t mode) {
+    char temp_path[1024];
+    // 安全拷贝路径，避免修改原字符串
+    snprintf(temp_path, sizeof(temp_path), "%s", path);
+    
+    // 遍历路径，逐个创建上级目录（处理多级路径）
+    for (char *p = temp_path + 1; *p; p++) {
+        if (*p == '/') {
+            *p = '\0'; // 截断路径，先创建当前层级
+            // 跳过根目录，且仅当目录不存在时创建
+            if (strcmp(temp_path, "/") != 0 && mkdir(temp_path, mode) == -1) {
+                if (errno != EEXIST) { // 已存在则忽略，其他错误返回失败
+                    return -1;
+                }
+            }
+            *p = '/'; // 恢复路径分隔符，继续处理下一级
+        }
+    }
+    
+    // 创建最后一级目录
+    if (mkdir(temp_path, mode) == -1) {
+        return (errno == EEXIST) ? 0 : -1; // 已存在则返回成功，否则失败
+    }
+    return 0;
+}
+
+// 严格保留原对外接口：函数名、参数、返回值完全不变
 void create_dfs_directory(char* path)
 {
   struct stat st;
-
-  if (stat(path, &st) == -1)
-    mkdir(path, 0755);
+  int res = -1; // 还原原始初始值，匹配业务逻辑
+  errno = 0;    // 初始化errno，清除历史残留值
+  
+  // 检查目录是否已存在
+  if (stat(path, &st) == -1) {
+    // 目录不存在，调用递归创建逻辑
+    res = mkdir_recursive(path, 0755);
+    // 创建成功则清零errno，避免stat的旧错误码残留
+    if (res == 0) {
+      errno = 0;
+    }
+  } else {
+    // 目录已存在，标记成功并清零errno
+    res = 0;
+    errno = 0;
+  }
+  
+  // 严格匹配原始输出格式（包含errno和错误描述）
+  printf("Created! %s %d | errno=%d, err_desc=%s\n", 
+         path, res, errno, strerror(errno));
 }
 
 // Creates directory for all the servers with sub directory for each of the user
