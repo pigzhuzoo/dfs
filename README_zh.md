@@ -17,6 +17,7 @@
 - **用户认证**: 支持多用户登录，每个用户有独立的存储空间
 - **多算法加密**: 支持多种加密算法，可在配置文件中选择
   - **AES-256-GCM**: 推荐使用，提供高强度加密和完整性验证
+  - **AES-256-ECB**: 使用ECB模式的AES-256加密（**已修复PKCS7填充问题**）
   - **SM4-CTR**: 国密算法支持，适用于合规性要求场景
   - **RSA-OAEP**: 非对称加密，适用于小数据加密场景
   - **XOR**: 简单异或加密，向后兼容（默认）
@@ -33,6 +34,11 @@
 - **PUT**: 上传文件到分布式存储
 - **GET**: 从分布式存储下载文件
 - **EXIT/QUIT**: 优雅退出客户端
+
+### 📊 性能测试框架（开发中）
+- **基础性能测试**: 已实现吞吐量、时延、成功率等指标测试
+- **学术级测试**: 正在完善多文件类型、统计分析、资源监控等功能
+- **自动化测试**: 已集成到Makefile，支持一键运行
 
 ## 系统架构
 
@@ -78,6 +84,7 @@ dfs_cpp/
 │   ├── netutils.cpp      # 网络工具实现  
 │   ├── dfsutils.cpp      # DFS服务器实现
 │   ├── dfcutils.cpp      # DFC客户端实现
+│   ├── crypto_utils.cpp  # 加密工具实现（新增）
 │   ├── dfs.cpp           # DFS服务器主程序
 │   └── dfc.cpp           # DFC客户端主程序
 ├── conf/                 # 配置文件目录
@@ -93,7 +100,9 @@ dfs_cpp/
 │   ├── test_get.sh       # GET命令测试脚本
 │   ├── test_put.py       # PUT命令测试脚本
 │   ├── test_client.py    # 客户端测试脚本
-│   └── *.txt             # 测试用的临时文件
+│   ├── performance_test.py    # 性能测试脚本（新增）
+│   ├── generate_plots.py      # 图表生成脚本（新增）
+│   └── run_performance_test.sh # 性能测试运行脚本（新增）
 ├── bin/                  # 可执行文件目录
 │   ├── dfs               # DFS服务器可执行文件
 │   └── dfc               # DFC客户端可执行文件
@@ -135,6 +144,17 @@ make start
 # 启动客户端
 make client
 ```
+
+### 性能测试
+```bash
+make perf-test            # 标准性能测试
+make perf-test-quick      # 快速测试（小文件）
+make perf-test-full       # 完整测试（大文件）
+make perf-test-academic   # 学术研究标准测试（开发中）
+make perf-plot-only       # 仅生成图表
+```
+
+> **注意**: 性能测试功能正在完善中，目前支持基础的吞吐量、时延和成功率测试。学术级测试功能（多文件类型、统计分析、资源监控等）正在开发中。
 
 ### 清理环境
 ```bash
@@ -266,12 +286,19 @@ Server DFS4 127.0.0.1:10004
 
 Username: Bob
 Password: ComplextPassword
+# EncryptionType options:
+# 1 or AES_256_GCM - AES-256-GCM加密（推荐，默认）
+# 2 or AES_256_ECB - AES-256-ECB加密（已修复PKCS7填充问题）
+# 3 or SM4_CTR - SM4-CTR加密（如果OpenSSL支持SM4）
+# 4 or RSA_OAEP - RSA-OAEP加密（仅用于小数据）
+EncryptionType: AES_256_GCM
 ```
 
 **配置项说明**:
 - `Server <名称> <IP:端口>`: 定义服务器节点
 - `Username`: 默认登录用户名
 - `Password`: 默认登录密码
+- `EncryptionType`: 加密算法类型
 
 ### 服务器配置 (conf/dfs.conf)
 ```
@@ -341,6 +368,13 @@ make clean
 make all
 ```
 
+#### 4. ECB模式加密问题
+**错误信息**: `Input size must be multiple of block size`
+
+**解决方案**:
+- 确保使用最新版本（已修复PKCS7填充问题）
+- 如果仍有问题，请检查OpenSSL版本兼容性
+
 ## 技术细节
 
 ### 多加密算法支持
@@ -350,7 +384,7 @@ make all
 | 加密类型 | 算法 | 密钥长度 | 模式 | 适用场景 |
 |---------|------|--------|------|--------|
 | AES-256-GCM | AES | 256位 | GCM | 推荐，高安全性，支持完整性验证 |
-| AES-256-ECB | AES | 256位 | ECB | 兼容性好，但安全性较低 |
+| AES-256-ECB | AES | 256位 | ECB | 兼容性好，但安全性较低（**已修复PKCS7填充**）|
 | SM4-CTR | SM4 | 128位 | CTR | 国密合规，国内应用场景 |
 | RSA-OAEP | RSA | 2048位 | OAEP | 小数据加密，密钥交换 |
 
@@ -358,10 +392,10 @@ make all
 在 `conf/dfc.conf` 中设置 `EncryptionType` 参数：
 ```
 # EncryptionType options:
-# 0 或 AES_256_GCM - AES-256-GCM加密（推荐，默认）
-# 1 或 AES_256_ECB - AES-256-ECB加密
-# 2 或 SM4_CTR - SM4-CTR加密（如果OpenSSL支持SM4）
-# 3 或 RSA_OAEP - RSA-OAEP加密（仅用于小数据）
+# 1 or AES_256_GCM - AES-256-GCM加密（推荐，默认）
+# 2 or AES_256_ECB - AES-256-ECB加密（已修复PKCS7填充问题）
+# 3 or SM4_CTR - SM4-CTR加密（如果OpenSSL支持SM4）
+# 4 or RSA_OAEP - RSA-OAEP加密（仅用于小数据）
 EncryptionType: AES_256_GCM
 ```
 
@@ -377,6 +411,11 @@ EncryptionType: AES_256_GCM
 - SM4-CTR需要OpenSSL 3.0以上版本且编译时启用国密支持
 - RSA-OAEP仅适用于小于200字节的数据加密
 - 更换加密算法后，旧文件仍可使用原算法解密
+
+### ECB模式重要更新
+- **已修复ECB模式问题**：启用OpenSSL自动PKCS7填充，确保任意大小文件都能正确加密/解密
+- **工业级兼容性**：符合PKCS7标准，与主流加密库兼容
+- **安全性考虑**：虽然ECB模式存在安全缺陷（相同明文产生相同密文），但在某些特定场景下仍可使用
 
 ### 文件分片算法
 文件分片基于文件内容的SHA256哈希值计算：
@@ -400,6 +439,13 @@ EncryptionType: AES_256_GCM
 - **前向兼容**: 支持新旧加密格式共存，旧文件可正常解密
 - **安全性**: 提供多种安全级别选择，满足不同场景需求
 
+### 性能测试框架
+- **基础指标**: 吞吐量(MB/s)、时延(秒)、成功率(%)、文件完整性验证
+- **多文件类型**: 支持随机数据、文本数据、二进制模式等多种文件类型测试
+- **统计分析**: 5次迭代测试，计算置信区间（标准差）
+- **资源监控**: CPU使用率、内存使用率等系统资源指标
+- **可视化输出**: 高分辨率PNG(300 DPI)和矢量PDF格式图表
+- **论文支持**: 自动生成LaTeX表格格式的性能数据
 
 ## 扩展与定制
 
@@ -413,9 +459,10 @@ EncryptionType: AES_256_GCM
 2. 启动服务器时指定新端口：`bin/dfs server/DFS1 20001`
 
 ### 自定义加密
-修改 `src/utils.cpp` 中的加密函数：
-- `encryptSplit()`: 文件分片加密
-- `decryptSplit()`: 文件分片解密
+修改 `src/crypto_utils.cpp` 中的加密函数：
+- `encryptData()`: 统一加密接口
+- `decryptData()`: 统一解密接口
+- 支持多种加密算法切换
 
 ## 贡献指南
 
@@ -437,3 +484,8 @@ EncryptionType: AES_256_GCM
 ---
 
 **注意**: 本系统适用于学习分布式系统原理，不建议在生产环境中使用。如需生产级分布式文件系统，请考虑HDFS、Ceph、GlusterFS等成熟解决方案。
+
+**当前开发状态**: 
+- ✅ **加密功能**: 已完成多算法支持，ECB模式填充问题已修复
+- 🚧 **性能测试**: 基础框架已完成，学术级功能正在完善中
+- 🔜 **未来计划**: 完善性能测试的统计分析、多文件类型支持和资源监控
