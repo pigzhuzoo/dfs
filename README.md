@@ -1,278 +1,239 @@
-# Distributed File System (DFS) - C++ Implementation
+# 分布式文件系统 - C++版本
 
-[![English](https://img.shields.io/badge/lang-English-blue)](#) [![中文](https://img.shields.io/badge/语言-中文-red)](README_zh.md)
+这是原C语言分布式文件系统的C++重写版本，采用了现代化的C++特性和面向对象设计。
 
-## Project Overview
+## 主要改进
 
-This is a C++ rewrite of the [https://github.com/Hasil-Sharma/distributed-file-system](https://github.com/Hasil-Sharma/distributed-file-system) project. The original project was implemented in C language, and this project has been refactored using C++17 standard while maintaining the original core functionality and architectural design.
+### 1. 语言和标准升级
+- 从C语言升级到C++17标准
+- 使用现代C++特性如智能指针、STL容器等
+- 更好的类型安全和内存管理
 
-## Core Features
+### 2. 面向对象设计
+- 将原有的结构体重构为类和结构体
+- 使用命名空间组织代码
+- 实现更好的封装和抽象
 
-### 📁 File Sharding and Redundant Storage
-- **Intelligent Sharding Algorithm**: Files are split into 4 logical blocks based on hash value modulo operation of file content
-- **Redundant Storage**: Each block is stored on 2 different servers, providing fault tolerance capability
-- **Integrity Verification**: Automatically detects file integrity to ensure data consistency
+### 3. 内存管理优化
+- 使用`std::unique_ptr`自动管理内存
+- 避免手动内存分配和释放
+- 减少内存泄漏风险
 
-### 🔒 Security and Authentication
-- **User Authentication**: Supports multi-user login with independent storage space for each user
-- **Data Encryption**: Uses XOR simple encryption algorithm to protect transmitted data
-- **Access Isolation**: Complete isolation between users' data, no interference
+### 4. 代码结构改进
+- 头文件使用`.hpp`扩展名
+- 源文件使用`.cpp`扩展名
+- 更清晰的目录结构：
+  ```
+  dfs_cpp/
+  ├── include/     # 头文件
+  ├── src/         # 源文件
+  ├── conf/        # 配置文件
+  ├── logs/        # 日志文件
+  └── bin/         # 可执行文件
+  ```
 
-### ⚡ High Performance Design
-- **Concurrent Processing**: Server supports multiple client concurrent connections
-- **Efficient Transmission**: Optimized network protocol reduces transmission overhead
-- **Memory Management**: Uses smart pointers for automatic memory management, avoiding leaks
+### 5. 标准库集成
+- 使用`std::string`替代C风格字符串
+- 使用`std::vector`替代动态数组
+- 使用`std::array`替代固定数组
+- 使用`std::ifstream`/`std::ofstream`替代FILE*
 
-### 🛠️ Complete Command Set
-- **MKDIR**: Create directory
-- **LIST**: List files and directories
-- **PUT**: Upload file to distributed storage
-- **GET**: Download file from distributed storage
-- **EXIT/QUIT**: Gracefully exit client
+### 6. 错误处理改进
+- 更好的异常处理机制
+- 类型安全的错误检查
+- 清晰的错误信息输出
 
-## System Architecture
+### 7. 多加密算法支持（新增）
+- **AES-256-GCM**: 使用OpenSSL EVP接口的AES-256-GCM加密（推荐，默认）
+- **AES-256-ECB**: 使用ECB模式的AES-256加密（已修复填充问题）
+- **SM4-CTR**: 国密SM4算法CTR模式加密（如果OpenSSL支持）
+- **RSA-OAEP**: RSA-OAEP加密（主要用于小数据加密）
 
-```
-+------------------+     +------------------+
-|   Client (DFC)   |     |   Server (DFS)   |
-+------------------+     +------------------+
-|                  |     |                  |
-|  • Connection    |<--->|  • Socket        |
-|    Management    | TCP |    Listening     |
-|  • Command       |     |  • Command       |
-|    Parsing       |     |    Processing    |
-|  • File Sharding |     |  • User          |
-|  • Data          |     |    Authentication|
-|    Encryption    |     |  • File          |
-|                  |     |    Operations    |
-+------------------+     +------------------+
-         ↑                        ↑
-         |                        |
-+------------------+     +------------------+
-| Configuration    |     | Data Storage     |
-| • dfc.conf       |     | • server/DFS1/   |
-| • User           |     | • server/DFS2/   |
-|   Credentials    |     | • server/DFS3/   |
-|                  |     | • server/DFS4/   |
-+------------------+     +------------------+
-```
+### 8. 性能测试框架（开发中）
+- **基础性能测试**: 已实现吞吐量、时延、成功率等指标测试
+- **学术级测试**: 正在完善多文件类型、统计分析、资源监控等功能
+- **自动化测试**: 已集成到Makefile，支持一键运行
 
-## Project Structure
+## 加密支持
 
-```
-dfs_cpp/
-├── server/               # Server data storage directory
-│   ├── DFS1/             # Server 1 data directory
-│   ├── DFS2/             # Server 2 data directory  
-│   ├── DFS3/             # Server 3 data directory
-│   └── DFS4/             # Server 4 data directory
-├── include/              # Header files directory
-│   ├── debug.hpp         # Debug utility class
-│   ├── utils.hpp         # General utility class (file operations, encryption, string processing)
-│   ├── netutils.hpp      # Network utility class (Socket communication, data serialization)
-│   ├── dfsutils.hpp      # DFS server utility class (command processing, user management)
-│   └── dfcutils.hpp      # DFC client utility class (connection management, command building)
-├── src/                  # Source files directory
-│   ├── utils.cpp         # General utility implementation
-│   ├── netutils.cpp      # Network utility implementation  
-│   ├── dfsutils.cpp      # DFS server implementation
-│   ├── dfcutils.cpp      # DFC client implementation
-│   ├── dfs.cpp           # DFS server main program
-│   └── dfc.cpp           # DFC client main program
-├── conf/                 # Configuration files directory
-│   ├── dfc.conf          # Client configuration file
-│   └── dfs.conf          # Server configuration file
-├── logs/                 # Log files directory
-│   ├── dfs1.log          # Server 1 log
-│   ├── dfs2.log          # Server 2 log
-│   ├── dfs3.log          # Server 3 log
-│   ├── dfs4.log          # Server 4 log
-├── tests/                # Test scripts directory
-│   ├── test_commands.sh  # Command test script
-│   ├── test_get.sh       # GET command test script
-│   ├── test_put.py       # PUT command test script
-│   ├── test_client.py    # Client test script
-│   └── *.txt             # Temporary test files
-├── bin/                  # Executable files directory
-│   ├── dfs               # DFS server executable
-│   └── dfc               # DFC client executable
-├── obj/                  # Compilation intermediate files directory
-├── Makefile              # Build script
-└── README.md             # Project documentation (English)
+分布式文件系统通过OpenSSL的EVP接口支持多种加密算法：
+
+- **AES-256-GCM (1)**: 使用GCM模式的AES-256认证加密（推荐，默认）
+- **AES-256-ECB (2)**: 使用ECB模式的AES-256加密（**已修复PKCS7填充问题**）
+- **SM4-CTR (3)**: CTR模式的SM4密码（如果OpenSSL支持SM4）
+- **RSA-OAEP (4)**: 使用OAEP填充的RSA加密（仅适用于小数据）
+
+在`conf/dfc.conf`中配置加密类型：
+```conf
+EncryptionType: AES_256_GCM
+
+**注意**: ECB模式的安全性考虑
+- ECB（Electronic Codebook）是最基本的分组密码工作模式
+- 相同的明文块总是产生相同的密文块，可能泄露数据模式
+- 不提供数据完整性保护
+- 适合加密随机数据或需要快速加密/解密的场景
+- 对于结构化数据，建议使用GCM等更安全的模式
+
+**ECB模式重要更新**: 
+- 已修复ECB模式要求输入大小为16字节倍数的问题
+- 启用OpenSSL自动PKCS7填充，确保工业级兼容性
+- 支持任意大小文件的正确加密/解密
 ```
 
-## Quick Start
+## 核心组件
 
-### Environment Requirements
-- **Operating System**: Linux (Ubuntu 20.04 LTS recommended)
-- **Compiler**: clang++ (C++17 support required)
-- **Dependencies**: OpenSSL development libraries
-- **Build Tools**: GNU Make
+### 工具类 (utils.hpp/cpp)
+- 文件和目录操作
+- 字符串处理函数
+- **多算法加密解密功能**
+- 哈希计算
 
-### Install Dependencies
+### 网络工具类 (netutils.hpp/cpp)
+- Socket通信封装
+- 数据序列化/反序列化
+- 网络协议处理
+
+### DFS工具类 (dfsutils.hpp/cpp)
+- 服务器端功能实现
+- 用户认证
+- 命令解析和执行
+
+### DFC工具类 (dfcutils.hpp/cpp)
+- 客户端功能实现
+- 连接管理
+- 命令构建和发送
+- **加密类型配置支持**
+
+### 加密工具类 (crypto_utils.hpp/cpp) - 新增
+- **统一的加密接口**
+- **OpenSSL EVP接口封装**
+- **多种加密算法支持**
+- **自动密钥生成**
+- **ECB模式PKCS7填充支持**
+
+## 编译和运行
+
+### 编译:
 ```bash
-# Install OpenSSL development libraries
-sudo apt-get update
-sudo apt-get install libssl-dev
+make all      # 清理并编译所有组件
+make dfs      # 编译服务器
+make dfc      # 编译客户端
 ```
 
-### Build Project
+### 运行:
 ```bash
-# Build all components (clean and rebuild)
-make all
-
-# Or build separately
-make dfs    # Build server
-make dfc    # Build client
+make start    # 启动四个服务器实例
+make client   # 启动客户端
+make run      # 查看服务器日志
 ```
 
-### Start System
+### 性能测试:
 ```bash
-# Start 4 server instances (ports 10001-10004)
-make start
-
-# Start client
-make client
+make perf-test            # 标准性能测试
+make perf-test-quick      # 快速测试（小文件）
+make perf-test-full       # 完整测试（大文件）
+make perf-test-academic   # 学术研究标准测试（开发中）
+make perf-plot-only       # 仅生成图表
 ```
 
-### Clean Environment
+> **注意**: 性能测试功能正在完善中，目前支持基础的吞吐量、时延和成功率测试。学术级测试功能（多文件类型、统计分析、资源监控等）正在开发中。
+
+### 清理:
 ```bash
-# Terminate all server processes
-make kill
-
-# Clear server data directories
-make clear
-
-# Clean compilation artifacts
-make clean
+make clean    # 清理编译产物
+make kill     # 终止服务器进程
+make clear    # 清空DFS目录
 ```
 
-## Client Usage Guide
+## 配置文件
 
-After starting the client, you will see the `>>>` prompt where you can enter the following commands:
-
-### 1. MKDIR - Create Directory
-**Syntax**: `MKDIR <directory_name>`
-
-**Function**: Creates the specified directory on all DFS servers
-
-**Examples**:
-```
->>> MKDIR documents
->>> MKDIR projects/
-```
-
-**Notes**:
-- Directory names can include or exclude trailing slash
-- Directory will be created under user directory on all servers
-- Error message displayed if directory already exists
-
-### 2. LIST - List Files/Directories
-**Syntax**: `LIST <path>`
-
-**Function**: Lists all files and directories in the specified path
-
-**Examples**:
-```
->>> LIST /
->>> LIST /documents
->>> LIST /projects/
-```
-
-**Output Format**:
-- Filenames displayed directly
-- Directory names displayed with `/` suffix
-- Incomplete files marked as `[INCOMPLETE]`
-
-**Notes**:
-- Path must start with `/` for absolute path
-- Empty path or `/` represents root directory
-- Automatic deduplication to avoid duplicate display
-
-### 3. PUT - Upload File
-**Syntax**: `PUT <local_file_path> <remote_filename>`
-
-**Function**: Uploads local file to DFS system
-
-**Examples**:
-```
->>> PUT /home/user/report.pdf backup_report.pdf
->>> PUT ./config.txt config_backup.txt
-```
-
-**Workflow**:
-1. Read local file content
-2. Calculate file content hash value to determine sharding strategy
-3. Split file into 4 logical blocks
-4. Encrypt each block and send to corresponding 2 servers
-5. Display upload success message
-
-**Notes**:
-- Local file path can be absolute or relative
-- Remote filename cannot contain path separators
-- Files are stored as hidden files (starting with `.`)
-
-### 4. GET - Download File
-**Syntax**: `GET <remote_filename> <local_save_path>`
-
-**Function**: Downloads file from DFS system to local
-
-**Examples**:
-```
->>> GET backup_report.pdf /home/user/restored.pdf
->>> GET config_backup.txt ./restored_config.txt
-```
-
-**Workflow**:
-1. Query all servers to get file shard information
-2. Verify file integrity (check if all shards exist)
-3. Download required shards from corresponding servers
-4. Decrypt and reassemble file
-5. Save to specified local path
-
-**Notes**:
-- Remote filename must exactly match the name specified during PUT
-- Local save path directory must exist
-- Error message displayed if file is incomplete
-
-### 5. Exit Client
-**Syntax**: `EXIT` or `QUIT`
-
-**Function**: Gracefully exits client program
-
-**Examples**:
-```
->>> EXIT
-<<< Goodbye!
-
->>> QUIT  
-<<< Goodbye!
-```
-
-**Notes**:
-- Command is case-insensitive (exit/EXIT, quit/QUIT both work)
-- Automatically closes all server connections
-- Returns to shell prompt after normal exit
-
-## Configuration Files
-
-### Client Configuration (conf/dfc.conf)
-```ini
+### 客户端配置 (conf/dfc.conf)
+```conf
 Server DFS1 127.0.0.1:10001
-Server DFS2 127.0.0.1:10002  
+Server DFS2 127.0.0.1:10002
 Server DFS3 127.0.0.1:10003
 Server DFS4 127.0.0.1:10004
 
 Username: Bob
 Password: ComplextPassword
+# EncryptionType options:
+# 1 or AES_256_GCM - AES-256-GCM encryption (recommended, default)
+# 2 or AES_256_ECB - AES-256-ECB encryption (with PKCS7 padding)
+# 3 or SM4_CTR - SM4-CTR encryption (if OpenSSL supports SM4)
+# 4 or RSA_OAEP - RSA-OAEP encryption (for small data only)
+EncryptionType: AES_256_GCM
 ```
 
-**Configuration Items**:
-- `Server <name> <IP:port>`: Defines server nodes
-- `Username`: Default login username
-- `Password`: Default login password
+## 功能特性
 
-### Server Configuration (conf/dfs.conf)
+保持了原有C版本的所有功能，并增加了：
+- **多加密算法支持**
+- **基于OpenSSL EVP接口的安全加密**
+- **可配置的加密类型**
+- **向后兼容的XOR加密**
+- **ECB模式PKCS7填充支持**
+- **性能测试框架（开发中）**
+- 文件分片存储和检索
+- 多服务器容错机制
+- 用户认证和权限管理
+- 支持GET/PUT/LIST/MKDIR命令
+- 并发客户端连接处理
+
+## 客户端使用指南
+
+启动客户端后，您可以在交互式命令行中输入以下命令：
+
+### 1. MKDIR - 创建目录
+```bash
+MKDIR <目录名>
+```
+**示例:**
+```
+>>> MKDIR myfolder
+```
+在所有DFS服务器上创建指定目录。
+
+### 2. LIST - 列出文件/目录
+```bash
+LIST <路径>
+```
+**示例:**
+```
+>>> LIST /
+>>> LIST /myfolder
+```
+列出指定路径下的所有文件和目录。
+
+### 3. PUT - 上传文件
+```bash
+PUT <本地文件路径> <远程文件名>
+```
+**示例:**
+```
+>>> PUT /home/user/document.txt backup.txt
+```
+将本地文件上传到DFS系统中，并可指定远程文件名。文件会根据配置的加密类型进行加密。
+
+### 4. GET - 下载文件
+```bash
+GET <远程文件名> <本地保存路径>
+```
+**示例:**
+```
+>>> GET backup.txt /home/user/restored_document.txt
+```
+从DFS系统下载文件，并使用配置的加密类型进行解密。
+
+### 5. EXIT/QUIT - 退出客户端
+```
+EXIT
+```
+```
+QUIT
+```
+
+## 服务器配置
+
 ```
 # Server user configuration
 # Format: username=password
@@ -280,122 +241,149 @@ Bob=ComplextPassword
 Alice=SimplePassword123
 ```
 
-**Configuration Items**:
-- Each line defines a user account
-- Format is `username=password`
-- Password used as file encryption key
+## 依赖
 
-## Troubleshooting
+- **编译器**: clang++ (C++17 support required)
+- **依赖库**: OpenSSL development libraries
 
-### Common Issues and Solutions
+```
+# Install OpenSSL development libraries
+sudo apt-get update
+sudo apt-get install libssl-dev
+```
 
-#### 1. Unable to Connect to Server
-**Error Message**: `Unable to Connect to any server`
+## 问题排查
 
-**Possible Causes**:
-- Server not started
-- Port occupied
-- Firewall blocking connection
+### 1. 无法连接到服务器
+```
+Unable to Connect to any server
+```
 
-**Solutions**:
-```bash
-# Check if server is running
+**可能原因**:
+- 服务器未启动
+- 端口被占用
+- 防火墙阻止连接
+
+**解决方法**:
+```
+# 检查服务器是否运行
 ps aux | grep dfs
 
-# Terminate old processes and restart
+# 终止旧进程并重启
 make kill
 make start
 
-# Check port usage
+# 检查端口使用情况
 netstat -tlnp | grep 1000
 ```
 
-#### 2. File Upload/Download Failure
-**Error Message**: `File not found` or `Incomplete file`
-
-**Possible Causes**:
-- Filename mismatch
-- Incomplete server storage
-- Network connection interrupted
-
-**Solutions**:
-```bash
-# Check server data directories
-ls -la server/DFS*/Bob/
-
-# Re-upload file
-# Ensure correct filename is used
+### 2. 文件上传/下载失败
+```
+File not found
 ```
 
-#### 3. Compilation Errors
-**Error Message**: OpenSSL header files not found
+**可能原因**:
+- 文件名不匹配
+- 服务器存储不完整
+- 网络连接中断
 
-**Solutions**:
-```bash
-# Install OpenSSL development libraries
+**解决方法**:
+```
+# 检查服务器数据目录
+ls -la server/DFS*/Bob/
+
+# 重新上传文件
+# 确保使用正确的文件名
+```
+
+### 3. 编译错误
+```
+OpenSSL header files not found
+```
+
+**解决方法**:
+```
+# 安装OpenSSL开发库
 sudo apt-get install libssl-dev
 
-# Rebuild
+# 重新编译
 make clean
 make all
 ```
 
-## Technical Details
+### 4. ECB模式加密问题
+```
+Input size must be multiple of block size
+```
 
-### File Sharding Algorithm
-File sharding is based on SHA256 hash value calculation of file content:
-- `mod = hash(file_content) % 4`
-- Shard distribution strategy determined by mod value:
-  - mod=0: Shard 1→servers 1,2; Shard 2→servers 2,3; Shard 3→servers 3,4; Shard 4→servers 4,1
-  - mod=1: Shard 1→servers 2,3; Shard 2→servers 3,4; Shard 3→servers 4,1; Shard 4→servers 1,2
-  - mod=2: Shard 1→servers 3,4; Shard 2→servers 4,1; Shard 3→servers 1,2; Shard 4→servers 2,3  
-  - mod=3: Shard 1→servers 4,1; Shard 2→servers 1,2; Shard 3→servers 2,3; Shard 4→servers 3,4
+**解决方案**:
+- 确保使用最新版本（已修复PKCS7填充问题）
+- 如果仍有问题，请检查OpenSSL版本兼容性
 
-### Network Protocol
-- **Data Format**: Big-endian (network byte order)
-- **Integer Transmission**: Uses htonl/ntohl conversion
-- **String Transmission**: Null-terminated C strings
-- **Error Handling**: Returns -1 for error, 0 for success
+## 技术细节
 
-### Encryption Mechanism
-- **Algorithm**: XOR simple encryption
-- **Key**: SHA256 hash of user password
-- **Security**: Suitable for demonstration purposes, production environments should use stronger encryption
+### 文件分片算法
+文件分片基于文件内容的SHA256哈希值计算：
+```
+mod = hash(file_content) % 4
+```
+分片分布策略由mod值决定：
+- mod=0: 分片1→服务器1,2; 分片2→服务器2,3; 分片3→服务器3,4; 分片4→服务器4,1
+- mod=1: 分片1→服务器2,3; 分片2→服务器3,4; 分片3→服务器4,1; 分片4→服务器1,2
+- mod=2: 分片1→服务器3,4; 分片2→服务器4,1; 分片3→服务器1,2; 分片4→服务器2,3
+- mod=3: 分片1→服务器4,1; 分片2→服务器1,2; 分片3→服务器2,3; 分片4→服务器3,4
 
+### 网络协议
+- **数据格式**: 大端序（网络字节序）
+- **整数传输**: 使用htonl/ntohl转换
+- **字符串传输**: 以空字符结尾的C字符串
+- **错误处理**: 返回-1表示错误，0表示成功
 
-## Extension and Customization
+### 加密机制
+- **算法**: 支持多种现代加密算法
+- **密钥**: 用户密码的SHA256哈希值
+- **填充**: ECB模式使用PKCS7自动填充
+- **安全性**: 推荐使用AES-256-GCM模式
 
-### Add New Server
-1. Modify `conf/dfc.conf` to add new Server line
-2. Add user configuration in `conf/dfs.conf`
-3. Update sharding algorithm logic (requires source code modification)
+## 扩展和定制
 
-### Change Port
-1. Modify port numbers in `conf/dfc.conf`
-2. Start server with new port: `bin/dfs server/DFS1 20001`
+### 添加新服务器
+1. 修改`conf/dfc.conf`添加新的Server行
+2. 在`conf/dfs.conf`中添加用户配置
+3. 更新分片算法逻辑（需要修改源代码）
 
-### Custom Encryption
-Modify encryption functions in `src/utils.cpp`:
-- `encryptSplit()`: File shard encryption
-- `decryptSplit()`: File shard decryption
+### 更改端口
+1. 修改`conf/dfc.conf`中的端口号
+2. 使用新端口启动服务器: `bin/dfs server/DFS1 20001`
 
-## Contribution Guidelines
+### 自定义加密
+修改`src/crypto_utils.cpp`中的加密函数：
+- `encryptData()`: 统一加密接口
+- `decryptData()`: 统一解密接口
+- 支持多种加密算法切换
 
-Pull requests and issues are welcome! Please follow these guidelines:
+## 贡献指南
 
-1. **Code Style**: Use clang-format to format code
-2. **Testing**: Ensure all existing tests pass
-3. **Documentation**: Update relevant documentation and comments
-4. **Commit Messages**: Use clear commit messages describing changes
+欢迎提交Pull Requests和Issues！请遵循以下指南：
 
-## License
+1. **代码风格**: 使用clang-format格式化代码
+2. **测试**: 确保所有现有测试通过
+3. **文档**: 更新相关文档和注释
+4. **提交信息**: 使用清晰的提交信息描述更改
 
-This project is for learning and research purposes only.
+## 许可证
 
-## Contact
+本项目仅供学习和研究用途。
 
-For questions or suggestions, please contact the project maintainer.
+## 联系
+
+如有问题或建议，请联系项目维护者。
 
 ---
 
-**Note**: This system is suitable for learning distributed system principles and is not recommended for production environments. For production-grade distributed file systems, consider mature solutions like HDFS, Ceph, or GlusterFS.
+**注意**: 本系统适合学习分布式系统原理，不推荐用于生产环境。对于生产级分布式文件系统，建议使用成熟的解决方案如HDFS、Ceph或GlusterFS。
+
+**当前开发状态**: 
+- ✅ **加密功能**: 已完成多算法支持，ECB模式填充问题已修复
+- 🚧 **性能测试**: 基础框架已完成，学术级功能正在完善中
+- 🔜 **未来计划**: 完善性能测试的统计分析、多文件类型支持和资源监控

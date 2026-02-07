@@ -1,7 +1,7 @@
 # Makefile for C++ Distributed File System
 CXX = clang++
 INCLUDE = /usr/lib
-LIBS = -lcrypto -lssl
+LIBS = -lcrypto -lssl -lstdc++fs
 CXXFLAGS = -std=c++17 -g -Wall -Wextra -Iinclude
 SRCDIR = src
 INCDIR = include
@@ -16,7 +16,7 @@ OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 DFS_TARGET = $(BINDIR)/dfs
 DFC_TARGET = $(BINDIR)/dfc
 
-.PHONY: all clean dfs dfc start run kill clear client dc ds test test-commands test-get test-put test-client full-clean
+.PHONY: all clean dfs dfc start run kill clear client dc ds test test-commands test-get test-put test-client full-clean perf-test perf-test-quick perf-test-full perf-test-academic perf-plot-only
 
 all: clean dfs dfc start run
 
@@ -89,6 +89,33 @@ test-put:
 test-client:
 	@echo "Running client tests..."
 	@python3 tests/test_client.py
+
+# 性能测试相关目标
+perf-test: 
+	@echo "Running comprehensive performance test..."
+	@chmod +x tests/run_performance_test.sh
+	@cd tests && ./run_performance_test.sh
+
+perf-test-quick:
+	@echo "Running quick performance test (small files)..."
+	@chmod +x tests/run_performance_test.sh
+	@cd tests && ./run_performance_test.sh --quick
+
+perf-test-full:
+	@echo "Running full performance test (large files)..."
+	@chmod +x tests/run_performance_test.sh
+	@cd tests && ./run_performance_test.sh --full
+
+perf-test-academic:
+	@echo "Running academic research standard performance test..."
+	@echo "This includes multiple file types (random, text, binary) and 5 iterations per configuration"
+	@chmod +x tests/run_performance_test.sh
+	@cd tests && ./run_performance_test.sh --academic
+
+perf-plot-only:
+	@echo "Generating plots from existing results..."
+	@chmod +x tests/run_performance_test.sh
+	@cd tests && ./run_performance_test.sh --plot-only
 
 # 开发调试目标
 dc: dfc
