@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\centering
+\caption{DFS Performance Metrics with 95\% Confidence Intervals}
+\label{tab:performance}
+\begin{tabular}{lcccccc}
+\toprule
+File Size & Type & PUT Thr. (MB/s) & GET Thr. (MB/s) & PUT Lat. (s) & GET Lat. (s) \\
+\midrule
+0.004 MB & random & 0.02 $\pm$ 0.00 & 0.01 $\pm$ 0.00 & 0.195 $\pm$ 0.016 & 0.274 $\pm$ 0.009 \\
+0.016 MB & random & 0.08 $\pm$ 0.00 & 0.06 $\pm$ 0.00 & 0.191 $\pm$ 0.004 & 0.282 $\pm$ 0.021 \\
+0.064 MB & random & 0.33 $\pm$ 0.04 & 0.28 $\pm$ 0.00 & 0.198 $\pm$ 0.025 & 0.229 $\pm$ 0.004 \\
+0.256 MB & random & 1.27 $\pm$ 0.13 & 0.91 $\pm$ 0.02 & 0.204 $\pm$ 0.023 & 0.282 $\pm$ 0.005 \\
+1.0 MB & random & 4.66 $\pm$ 0.11 & 3.89 $\pm$ 0.24 & 0.215 $\pm$ 0.005 & 0.258 $\pm$ 0.017 \\
+4.0 MB & random & 13.98 $\pm$ 0.36 & 14.58 $\pm$ 0.29 & 0.286 $\pm$ 0.007 & 0.275 $\pm$ 0.006 \\
+16.0 MB & random & 30.75 $\pm$ 0.91 & 30.81 $\pm$ 0.39 & 0.521 $\pm$ 0.016 & 0.519 $\pm$ 0.007 \\
+\bottomrule
+\end{tabular}
+\\\small{Random seed: 42, Confidence level: 95\%}
+\end{table*}
