@@ -1,0 +1,14 @@
+System Information for Reproducibility
+============================================================
+Experiment Timestamp: 2026-03-10T20:38:25.335420
+Random Seed: 42
+Warmup Iterations: 2
+Cooldown Seconds: 1
+Confidence Level: 95%
+Outliers Removed: False
+Python Version: 3.7.0 (default, Jun 28 2018, 13:15:42) 
+[GCC 7.2.0]
+OS Info: ['Linux', '101', '5.15.0-130-generic', '#140~20.04.1-Ubuntu SMP Wed Dec 18 21:35:34 UTC 2024', 'x86_64']
+CPU Count: 56
+Memory Total (GB): 125.55
+SciPy Available: True

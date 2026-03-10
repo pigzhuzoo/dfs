@@ -1,0 +1,97 @@
+# Build artifacts
+bin/
+obj/
+*.o
+*.a
+*.so
+*.dylib
+
+# Executables
+dfs
+dfc
+dfc-unified
+
+# Server data
+server/DFS1/
+server/DFS2/
+server/DFS3/
+server/DFS4/
+
+# Logs
+logs/
+*.log
+
+# Test outputs
+tests/integration/*.json
+tests/integration/*.bin
+tests/integration/downloaded_*
+tests/unit/*.json
+tests/unit/*.bin
+
+# Performance test results (keep structure but ignore generated files)
+tests/performance/plots/*.json
+tests/performance/plots/*.png
+tests/performance/plots/*.pdf
+tests/performance/plots/*.tex
+tests/performance/plots/*.txt
+tests/performance/plots/throughput/
+tests/performance/plots/latency/
+tests/performance/plots/cpu_usage/
+tests/performance/plots/memory_usage/
+tests/performance/plots/success_rate/
+tests/performance/plots/speedup/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# FPGA bitstream (user-specific)
+*.xclbin
+
+# Configuration backups
+conf/*.bak
+conf/*.backup
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
